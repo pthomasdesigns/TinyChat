@@ -18,14 +18,11 @@ public abstract class TinyChatTxMessageDatabase extends RoomDatabase {
             synchronized (TinyChatTxMessageDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            TinyChatTxMessageDatabase.class, "txmessage.db")
+                            TinyChatTxMessageDatabase.class, TinyChatConstants.MESSAGE_DB)
                             .build();
                 }
             }
         }
         return INSTANCE;
     }
-
-
-
 }

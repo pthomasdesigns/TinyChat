@@ -3,7 +3,6 @@ package com.opengarden.testproject;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.text.method.ScrollingMovementMethod;
@@ -13,11 +12,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import com.google.gson.Gson;
-
-import java.text.DateFormat;
-import java.util.Date;
 
 public class TinyChatMainActivity extends Activity {
 
@@ -39,10 +33,9 @@ public class TinyChatMainActivity extends Activity {
 
         b_send = (Button) findViewById(R.id.b_send);
         et_message = (EditText) findViewById(R.id.et_message);
+
         tv_response = (TextView) findViewById(R.id.tv_response);
-
         tv_response.setMovementMethod(new ScrollingMovementMethod());
-
 
         createThreads();
         createListeners();
@@ -77,8 +70,8 @@ public class TinyChatMainActivity extends Activity {
                         tv_response.append((String) message.obj + "\n");
                         break;
                     case TinyChatConstants.NETWORK_AVAILABLE:
-                        tinyChatTx.onNetworkAvailable();
                         tinyChatRx.onNetworkAvailable();
+                        tinyChatTx.onNetworkAvailable();
                         break;
                     case TinyChatConstants.NETWORK_NOT_AVAILABLE:
                         tinyChatTx.onNetworkUnavailable();
@@ -88,7 +81,6 @@ public class TinyChatMainActivity extends Activity {
                         break;
                 }
             }
-
         };
         tinyChatRx = new TinyChatRx(uiHandler);
         tinyChatTx = new TinyChatTx(uiHandler);
@@ -122,6 +114,4 @@ public class TinyChatMainActivity extends Activity {
         txMessage.client_time = Long.toString(System.currentTimeMillis());
         tinyChatTx.sendMessage(txMessage);
     }
-
-
 }

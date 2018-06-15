@@ -17,7 +17,6 @@ public class TinyChatRx {
 
     public TinyChatRx(Handler handler) {
         uiHandler = handler;
-
     }
 
     void onNetworkAvailable() {
@@ -96,19 +95,13 @@ public class TinyChatRx {
         }
     }
 
-    private void closeSocket()
-    {
-        //txHandler.post(new Runnable() {
-        //  @Override
-        //public void run() {
+    private void closeSocket() {
         try {
             socket.close();
         } catch (Exception e) {
             Log.d(TAG, "Close exception" + e);
             return;
         }
-        //}
-        //});
     }
 
     private void onRxError(String error) {

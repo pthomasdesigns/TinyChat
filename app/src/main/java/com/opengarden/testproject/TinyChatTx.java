@@ -1,13 +1,10 @@
 package com.opengarden.testproject;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.util.Log;
-
 import com.google.gson.Gson;
-
 import java.io.BufferedWriter;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -68,18 +65,13 @@ public class TinyChatTx {
 
     private void closeSocket()
     {
-        //txHandler.post(new Runnable() {
-          //  @Override
-            //public void run() {
-                try {
-                    if (socket != null) socket.close();
-                    socket = null;
-                } catch (Exception e) {
-                    Log.d(TAG, "Close exception" + e);
-                    return;
-                }
-            //}
-        //});
+        try {
+            if (socket != null) socket.close();
+                socket = null;
+            } catch (Exception e) {
+                Log.d(TAG, "Close exception" + e);
+                return;
+            }
     }
 
     private void sendPendingMessages() {

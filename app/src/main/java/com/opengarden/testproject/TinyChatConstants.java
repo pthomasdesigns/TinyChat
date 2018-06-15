@@ -4,6 +4,8 @@ public class TinyChatConstants {
     public static final String SERVER_ADDR = "52.91.109.76";
     public static final int SERVER_PORT = 1234;
 
+    public static final String MESSAGE_DB = "txmessage.db";
+
     public static final int TX_ERROR = 1;
     public static final int RX_ERROR = 2;
     public static final int RX_MESSAGE = 3;
