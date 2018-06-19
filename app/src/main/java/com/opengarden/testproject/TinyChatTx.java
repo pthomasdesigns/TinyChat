@@ -18,6 +18,7 @@ public class TinyChatTx {
     private Handler uiHandler;
     private static Gson gson;
     Socket socket;
+    private int numRetries = 0;
 
     public TinyChatTx(Handler handler) {
         uiHandler = handler;
@@ -27,16 +28,36 @@ public class TinyChatTx {
     public void start() {
         txThread = new HandlerThread("Tx-Thread");
         txThread.start();
-        txHandler = new Handler(txThread.getLooper());
+        txHandler = new Handler(txThread.getLooper()) {
+            @Override
+            public void handleMessage(Message message) {
+                Log.d(TAG, "handleMessage:" + message.what);
+                switch(message.what)
+                {
+                    case TinyChatConstants.SOCKET_ERROR:
+                        if (numRetries++ < TinyChatConstants.MAX_RETRIES) {
+                            createSocket(1000);
+                        } else {
+                            Log.d(TAG, "Max retries exceeded");
+                        }
+                        break;
+                    case TinyChatConstants.SOCKET_SUCCESS:
+                        numRetries = 0;
+                        sendPendingMessages();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
         if (TinyChatNetUtils.isNetworkAvailable(TinyChatApplication.getAppContext())) {
             onNetworkAvailable();
         }
     }
 
     public void onNetworkAvailable() {
-        createSocket();
-        sendPendingMessages();
-    }
+        createSocket(0);
+   }
 
     public void onNetworkUnavailable() {
         closeSocket();
@@ -47,20 +68,22 @@ public class TinyChatTx {
         txThread.quit();
     }
 
-    private void createSocket()
+    private void createSocket(int delay)
     {
         if (socket != null) return;
-        txHandler.post(new Runnable() {
+        txHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 try {
                     socket = new Socket(TinyChatConstants.SERVER_ADDR, TinyChatConstants.SERVER_PORT);
                 } catch (Exception e) {
                     Log.d(TAG, "Connect exception" + e);
+                    onSocketFailed();
                     return;
                 }
+                onSocketSuccess();
             }
-        });
+        }, delay);
     }
 
     private void closeSocket()
@@ -138,6 +161,16 @@ public class TinyChatTx {
 
     private void onMessageSaved() {
         Message msg = uiHandler.obtainMessage(TinyChatConstants.TX_ERROR, "Message saved");
+        msg.sendToTarget();
+    }
+
+    private void onSocketFailed() {
+        Message msg = txHandler.obtainMessage(TinyChatConstants.SOCKET_ERROR, "Socket Error");
+        msg.sendToTarget();
+    }
+
+    private void onSocketSuccess() {
+        Message msg = txHandler.obtainMessage(TinyChatConstants.SOCKET_SUCCESS, "Socket Success");
         msg.sendToTarget();
     }
 }
